@@ -1,0 +1,13 @@
+.table-wrapper {
+  width: 600px;
+  margin: 0 auto;
+}
+table tr td:last-child {
+  width: 120px;
+}
+body {
+  color: #252f41;
+  background: #2a5daa;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+}

@@ -1,0 +1,289 @@
+-- Database: CRM_DB
+
+-- DROP DATABASE IF EXISTS "CRM_DB";
+
+CREATE DATABASE "CRM_DB"
+    WITH 
+    OWNER = postgres
+    ENCODING = 'UTF8'
+    LC_COLLATE = 'English_United States.1252'
+    LC_CTYPE = 'English_United States.1252'
+    TABLESPACE = pg_default
+    CONNECTION LIMIT = -1;
+	
+	CREATE TABLE task(
+	task_id SERIAL PRIMARY KEY,
+		task_name VARCHAR(30),
+		task_desc VARCHAR(30),
+		task_status VARCHAR(25),
+		start_date DATE,
+		expected_end_date DATE,
+		actual_end_date DATE,
+		assigned_by VARCHAR(30),
+		module_id INT,
+		module_name VARCHAR(25),
+		emp_id INT REFERENCES employee(emp_id)
+	);
+	
+	SELECT * FROM task;
+	
+	INSERT INTO task(task_id,task_name,task_desc,task_status,start_date,expected_end_date,actual_end_date,assigned_by,module_id,module_name,emp_id)
+	VALUES(101,'Modem Fixation','Fixing modem','Completed','2021-02-21','2021-02-22','2021-02-21','Radhika Dhobley',01,'Employee',201),
+	(102,'Customer care','To convert lead to customer','Ongoing','2021-05-10','2021-05-15',NULL,'Sumit Patkal',02,'Employee',202),
+	(103,'WiFi Setup','Setup Wifi','pending','2021-07-12','2021-07-15',NULL,'Prajakta Kelkar',03,'Employee',203),
+	(104,'Support specialist','Offer new plan to customer','Completed','2021-09-05','2021-09-12','2021-09-10','Saurabh Jain',04,'Customer',204),
+	(105,'Customer care','To convert lead to customer','Completed','2021-12-10','2021-12-20','2021-12-16','Sumit Patkal',05,'Employee',205);
+	
+	
+	
+	CREATE TABLE person(
+	person_id SERIAL PRIMARY KEY,
+	first_name VARCHAR(30),
+		last_name VARCHAR(30),
+		gender char(2),
+		date_of_birth DATE,
+		email VARCHAR(32),
+		contact_no BIGINT,
+		address VARCHAR(50)	
+	);
+	
+	SELECT * FROM person;
+	
+INSERT INTO person(person_id,first_name,last_name,gender,date_of_birth,email,contact_no,address)
+VALUES(301,'Stuti','Damle','F','1999-02-02','stutidamle@gmail.com',8975641536,'52-Friends colony Sadar,Nagpur'),
+(302,'Palak','Mehandole','F','1998-08-10','palakm10@gmail.com',7956481236,'12-Nilgiri appt,Saoner'),
+(303,'Nitin','Rahangdale','M','1995-09-30','rahangdalenitin@gmail.com',9632157945,'V-152 Ashwamedh appt,Gondia'),
+(304,'Aditya','Indurkar','M','1997-03-08','indurkaradi@gmail.com',8974561256,'B-19 Avadh appt,Nagpur'),
+(305,'Priyanka','Bajaj','F','1996-02-24','priyankab24@gmail.com',9685741425,'56 Sundarban Layout,Wardha');
+	
+	
+	CREATE TABLE employee(
+	emp_id SERIAL PRIMARY KEY,
+		designation VARCHAR(30),
+		person_id SERIAL REFERENCES person(person_id),
+		cust_id SERIAL REFERENCES customer(cust_id)
+		);
+		
+	SELECT * FROM employee;
+	ALTER TABLE employee
+	DROP COLUMN cust_id;
+	
+	INSERT INTO employee(emp_id,designation,person_id)
+	VALUES(201,'Customer care',301),
+	(202,'Support Specialist',302),
+	(203,'Customer Care',303),
+	(204,'Customer care',304),
+	(205,'Support Specialist',305);
+	
+
+	CREATE TABLE leads(
+	lead_id SERIAL PRIMARY KEY,
+		created_at DATE,
+		created_by DATE,
+		person_id SERIAL REFERENCES person(person_id)
+	);
+	ALTER TABLE leads
+	DROP COLUMN created_by;
+	SELECT * FROM leads;
+INSERT INTO leads (lead_id,created_at,person_id)
+VALUES (401,'2021-12-10',301),
+(402,'2021-09-05',302),
+(403,'2021-02-12',303),
+(404,'2021-07-15',304),
+(405,'2021-02-21',305);
+
+
+
+	CREATE TABLE opportunity(
+	opportunity_id SERIAL PRIMARY KEY,
+		created_at DATE,
+		lead_id SERIAL REFERENCES leads(lead_id),
+		plan_id SERIAL REFERENCES plan(plan_id),
+		emp_id SERIAL REFERENCES employee(emp_id)
+		);
+	SELECT * FROM opportunity;
+
+INSERT INTO opportunity (opportunity_id,created_at,lead_id,plan_id,emp_id)
+VALUES (501,'2021-12-10',401,601,201),
+(502,'2021-09-05',402,602,202),
+(503,'2020-02-12',403,603,203),
+(504,'2021-07-15',404,603,204),
+(505,'2021-02-21',405,602,205);
+
+
+
+	CREATE TABLE customer(
+	cust_id SERIAL PRIMARY KEY,
+	cust_username VARCHAR(30),
+		cust_password VARCHAR(30),
+		acc_details VARCHAR(30),
+		opportunity_id SERIAL REFERENCES opportunity(opportunity_id),
+		plan_id SERIAL REFERENCES plan(plan_id)
+	);
+	
+	SELECT * FROM customer;
+INSERT INTO customer (cust_id,cust_username,cust_password,acc_details,opportunity_id,plan_id)
+VALUES (701,'stutidamle','stutid0202','2018101011',501,601),
+(702,'palakmehandole','palakmeh0810','2018101012',502,602),
+(703,'nitinrahangdale','nitinr1995','2018101013',503,603),
+(704,'adityaindurkar','indurkaradi97','2018101014',504,601),
+(705,'priyankabajaj','prinka0224','2018101015',501,602);
+
+
+
+	CREATE TABLE plan(
+	plan_id SERIAL PRIMARY KEY,
+		plan_name VARCHAR(30),
+		validity VARCHAR(30),
+		plan_data VARCHAR(30),
+		price char(15)
+	);
+	SELECT * FROM plan;
+	
+INSERT INTO plan (plan_id,plan_name,validity,plan_data,price)
+VALUES (601,'Gold','1 month','Unlimited','999Rs'),
+(602,'Silver','1 Month','Unlimited','599Rs'),
+(603,'Platinum','1 month','Unlimited','799Rs');
+
+========================================== QUERIES ========================================
+
+--1. Query to insert minimum 50 records lead the table
+
+INSERT INTO leads(lead_id,created_at,person_id)
+VALUES(406,'2021-01-10',301),(407,'2021-01-11',302),
+(408,'2021-01-20',303),(409,'2021-01-29',304),
+(410,'2021-02-01',305),(411,'2021-02-12',305),
+(412,'2021-02-20',304),(413,'2021-02-27',303),
+(414,'2021-03-07',302),(415,'2021-03-15',301),
+(416,'2021-03-23',302),(417,'2021-03-29',303),
+(418,'2021-04-14',304),(419,'2021-04-19',305),
+(420,'2021-04-26',301),(421,'2021-05-01',305),
+(422,'2021-05-06',305),(423,'2021-05-12',303),
+(424,'2021-05-18',302),(425,'2021-05-21',301),
+(426,'2021-05-29',303),(427,'2021-06-02',304),
+(428,'2021-06-09',305),(429,'2021-06-12',301),
+(430,'2021-06-15',302),(431,'2021-06-21',301),
+(432,'2021-06-25',303),(433,'2021-06-30',305),
+(434,'2021-07-01',302),(435,'2021-07-05',304),
+(436,'2021-07-10',301),(437,'2021-07-13',302),
+(438,'2021-07-19',303),(439,'2021-07-24',304),
+(440,'2021-08-04',305),(441,'2021-08-08',301),
+(442,'2021-08-18',301),(443,'2021-08-24',305),
+(444,'2021-09-01',305),(445,'2021-09-25',302),
+(446,'2021-09-30',302),(447,'2021-10-25',304),
+(448,'2021-11-04',304),(449,'2021-11-24',303),
+(450,'2021-12-15',303);
+
+
+-- 2. Query to convert Lead to opportunity, Account
+
+INSERT INTO opportunity(opportunity_id,created_at,lead_id,plan_id,emp_id)
+VALUES(506,'2021-12-15',450,601,201),
+(507,'2021-08-04',440,602,202),
+(508,'2021-06-15',430,603,203),
+(509,'2021-04-26',420,603,204),
+(510,'2021-02-01',410,602,205);
+
+
+-- 3. Query to get a list of all leads
+SELECT l.lead_id,l.created_at,p.person_id,p.first_name,p.last_name,p.gender,p.date_of_birth,p.email,p.contact_no,p.address
+FROM leads l
+JOIN person p on p.person_id = l.person_id;
+
+
+-- 4. Query to get all leads which converted to opportunity
+SELECT o.opportunity_id,o.created_at,l.lead_id,pl.plan_id,pl.plan_name,e.emp_id
+FROM opportunity o
+JOIN plan pl ON pl.plan_id = o.plan_id
+JOIN leads l on l.lead_id = o.lead_id
+JOIN employee e ON e.emp_id = o.emp_id;
+
+
+-- 5. Query to get all leads converted to account 
+
+SELECT c.cust_id, c.cust_username,c.acc_details, o.opportunity_id, pl.plan_id,l.lead_id,p.person_id,p.first_name,p.last_name
+FROM customer c
+JOIN plan pl ON pl.plan_id = c.plan_id
+JOIN opportunity o ON o.opportunity_id = c.opportunity_id
+JOIN leads l ON l.lead_id = o.lead_id
+JOIN person p on p.person_id = l.person_id;
+
+
+-- 6. Query to get all contacts of an account
+SELECT c.cust_id,c.cust_username,c.acc_details,o.opportunity_id,l.lead_id,p.person_id,p.contact_no
+FROM customer c
+JOIN opportunity o ON o.opportunity_id = c.opportunity_id
+JOIN leads l ON l.lead_id = o.lead_id
+JOIN person p ON p.person_id = l.person_id;
+
+-- 7. Query to get the count of task module wise
+SELECT emp_id, COUNT(*) AS total_task FROM task
+GROUP BY emp_id;
+
+
+-- 8. Query to get all tasks of Leads, Opportunity, Account
+
+SELECT * FROM task;
+
+
+--9. Query to get all accounts that do not have contacts
+
+SELECT c.cust_id,o.opportunity_id,l.lead_id,p.person_id,p.contact_no
+FROM  customer c
+JOIN opportunity o ON o.opportunity_id = c.opportunity_id
+JOIN leads l ON l.lead_id = o.lead_id
+JOIN person p ON p.person_id = l.person_id
+WHERE p.contact_no is NULL;
+
+
+
+-- 10.Query to get all task which is not created today.
+SELECT * from task WHERE start_date < '2021-12-10';
+
+--11.Query to get all the task completed
+
+SELECT * FROM task WHERE task_status ='Completed';
+
+
+-- 12.Query to get all upcoming tasks
+
+SELECT * FROM task WHERE start_date >= '2021-12-10';
+
+
+-- 13.Query to fetch account and its contacts with account id, account name
+SELECT c.cust_id, c.cust_username,p.contact_no
+FROM customer c
+JOIN opportunity o ON o.opportunity_id = c.opportunity_id
+JOIN leads l ON l.lead_id = o.lead_id
+JOIN person p ON p.person_id=l.person_id;
+
+
+-- 14.Query to get the count of leads which is converted to account
+SELECT COUNT(*) AS customer_count
+FROM customer;
+
+
+-- 15.Query to get all Opportunity
+SELECT * FROM opportunity;
+
+
+-- 16.Query to get all opportunity which converted to account
+SELECT * FROM customer;
+
+
+-- 17.Query to get count which plan is taken how many times
+SELECT COUNT(*) planTaken,
+p.plan_id, p.plan_name FROM plan p
+INNER JOIN customer c
+ON c.plan_id=p.plan_id
+GROUP BY p.plan_id;
+
+SELECT * FROM customer;
+
+
+
+
+
+
+
+
