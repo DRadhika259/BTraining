@@ -3,7 +3,9 @@ import React, { useState, useEffect } from "react";
 import { useParams,useHistory} from "react-router-dom";
 
 import classes from './Tourist.module.css';
+import useInput from '../hooks/use-input';
 
+const isTenNum = value => value.trim().length ===10;
 const UpdateTourist = () => {
    const history = useHistory();
    const { touristId } = useParams();
@@ -11,6 +13,36 @@ const UpdateTourist = () => {
    const[place, setTouristPlace] = useState('');
    const[email_id, setTouristEmail] = useState('');
    const[phone_no, setTouristPhone] = useState('');
+
+   const { 
+    hasError: nameInputHasError,
+    valueChangeHandler: nameChangeHandler,
+    inputBlurHandler: nameBlurHandler,
+    reset: resetNameInput,
+ } = useInput(value => value.trim() !== ''); 
+
+ const {
+  hasError: placeInputHasError,
+  valueChangeHandler: placeChangeHandler,
+  inputBlurHandler: placeBlurHandler,
+  reset: resetPlaceInput,
+} = useInput(value => value.trim() !== ''); 
+
+const {
+    hasError: emailInputHasError,
+    valueChangeHandler: emailChangeHandler,
+    inputBlurHandler: emailBlurHandler,
+    reset: resetEmailInput,
+ } = useInput(value => value.includes('@')); 
+
+ const {
+  hasError: phoneNumberHasError, 
+  valueChangeHandler:phoneNumberChangeHandler, 
+  inputBlurHandler: phoneNumberBlurHandler ,
+  reset: resetPhoneNumber,
+ }= useInput(isTenNum);
+
+ 
 
    useEffect(()=>{
        console.log(touristId);
@@ -47,34 +79,73 @@ const UpdateTourist = () => {
           });
           console.log(updateTourist);
         
-          alert('Tourist updated successfully');
+         
           history.push("/");
-       
+          resetNameInput();
+          resetPlaceInput();
+          resetEmailInput();
+          resetPhoneNumber();
          }
+
+    const nameInputClasses = nameInputHasError
+    ? 'form-control invalid' 
+    : 'form-control';
+
+    const placeInputClasses = placeInputHasError
+    ? 'form-control invalid' 
+    : 'form-control';
+
+    const emailInputClasses = emailInputHasError
+    ? 'form-control invalid' 
+    : 'form-control';
+
+    const phoneInputClasses = phoneNumberHasError
+    ? 'form-control invalid' 
+    : 'form-control';
 
          return(
             <div>      
         <form >
-        <div className={classes.control}>
-       
-
+        <div className={nameInputClasses}>
         <label htmlFor='name'>Name</label>
-        <input type='text' value={name} id='name' onChange={(e) => setTouristName(e.target.value)} />
+        <input type='text' 
+        value={name} 
+        id='name' 
+        onChange={(e) => setTouristName(e.target.value) && nameChangeHandler}
+        onBlur={nameBlurHandler}
+        />
         </div>
-        <div className={classes.control}>
+
+        <div className={placeInputClasses}>
         <label htmlFor='place'>Place</label>
-        <input type='text' id='place'  value={place}  onChange={(e) => setTouristPlace(e.target.value)} />
+        <input type='text' 
+        id='place'  
+        value={place}  
+        onChange={(e) => setTouristPlace(e.target.value) && placeChangeHandler} 
+        onBlur={placeBlurHandler}
+        />
         </div>
-        <div className={classes.control}>
+
+        <div className={emailInputClasses}>
         <label htmlFor='email'>Email-Id</label>
-        <input type='email' id='email' value={email_id} onChange={(e) => setTouristEmail(e.target.value)}/>
+        <input type='email' 
+        id='email' 
+        value={email_id} 
+        onBlur={emailBlurHandler}
+        onChange={(e) => setTouristEmail(e.target.value) && emailChangeHandler}
+        
+        />
         </div>
-        <div className={classes.control}>
+        <div className={phoneInputClasses}>
         <label htmlFor='phone'>Phone No.</label>
-        <input type='text' id='phone'  value={phone_no} onChange={(e) => setTouristPhone(e.target.value)} />
+        <input type='text' 
+        id='phone'  
+        value={phone_no} 
+        onBlur={phoneNumberBlurHandler}
+        onChange={(e) => setTouristPhone(e.target.value) && phoneNumberChangeHandler} />
         </div>
         <div className={classes.actions}>
-        <button onClick={submitHandler}type='submit'>Update Tourist</button>
+        <button onClick={submitHandler}  type='submit'>Update Tourist</button>
              
         </div>
  
